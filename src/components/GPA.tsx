@@ -29,7 +29,7 @@ const yearDisplayMap: Record<string, string> = {
 const GPA: React.FC = () => {
   const [subjects, setSubjects] = useState<Subject[]>(defaultSubjects);
   const [overallGPA, setOverallGPA] = useState('4.0');
-  const [expandedYear, setExpandedYear] = useState<string | null>('Year One');
+  const [expandedYear, setExpandedYear] = useState<string | null>('Year Five');
 
   useEffect(() => {
     // Fetch subjects from backend
@@ -53,7 +53,7 @@ const GPA: React.FC = () => {
   };
 
   // Group subjects by year
-  const years = ['Year One', 'Year Two', 'Year Three', 'Year Four'];
+  const years = ['Year One', 'Year Two', 'Year Three', 'Year Four', 'Year Five'];
   const subjectsByYear = years.reduce((acc, y) => {
     acc[y] = subjects.filter(s => s.year === y);
     return acc;

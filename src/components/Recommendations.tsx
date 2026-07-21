@@ -12,7 +12,7 @@ interface Letter {
   pdfUrl?: string;
 }
 
-const keyQuotes: Record<string, { quote: string; quoteRu?: string }> = {
+const keyQuotes: Record<string, { quote: string; quoteRu?: string; quoteAr?: string }> = {
   'Eng. Ahmed Fathy': {
     quote: "Youssef has successfully represented our school in numerous scientific and programming competitions, earning outstanding achievements at both national and international levels."
   },
@@ -25,6 +25,10 @@ const keyQuotes: Record<string, { quote: string; quoteRu?: string }> = {
   'Mr. Mahmoud Ragab': {
     quote: "I have every confidence that Youssef will continue to excel in higher education and in his future professional career. He has my highest recommendation.",
     quoteRu: "Я полностью уверен в том, что Юссеф продолжит добиваться успехов в высшем образовании и в своей будущей профессиональной карьере."
+  },
+  'Ahmed El Shamy': {
+    quote: "Throughout both roles, he consistently demonstrated a strong willingness to learn, adapt, and grow. These qualities make him a valuable asset to any team.",
+    quoteAr: "خلال الفترتين، أظهر سرعة كبيرة في التعلم، وقدرة على التأقلم مع المسؤوليات الجديدة، وحرصًا دائمًا على التطور."
   }
 };
 
@@ -95,6 +99,7 @@ const Recommendations: React.FC = () => {
           {letters.map((letter, idx) => {
             const keyInfo = keyQuotes[letter.title] || { quote: letter.description.substring(0, 150) + "..." };
             const isRussianTeacher = letter.title.includes('Mahmoud Ragab');
+            const isArabicLetter = letter.title.includes('Ahmed El Shamy');
 
             return (
               <motion.div
@@ -121,6 +126,15 @@ const Recommendations: React.FC = () => {
                       </p>
                       <p className="text-gray-400 italic font-light leading-relaxed text-sm md:text-base border-l-2 border-gold/40 pl-3">
                         "{keyInfo.quoteRu}"
+                      </p>
+                    </div>
+                  ) : isArabicLetter && keyInfo.quoteAr ? (
+                    <div className="space-y-3">
+                      <p className="text-gray-300 italic font-light leading-relaxed text-sm md:text-base border-l-2 border-blue-500/40 pl-3">
+                        "{keyInfo.quote}"
+                      </p>
+                      <p className="text-gray-400 italic font-light leading-relaxed text-sm md:text-base border-r-2 border-gold/40 pr-3 text-right" dir="rtl">
+                        "{keyInfo.quoteAr}"
                       </p>
                     </div>
                   ) : (
@@ -219,6 +233,33 @@ const Recommendations: React.FC = () => {
                         🇷🇺 Russian Version (Русская версия)
                       </div>
                       {getParagraphs(selectedLetter.description.split('=== RUSSIAN VERSION ===')[1] || '').map((para, idx) => (
+                        <p key={idx} className="text-gray-300 text-sm md:text-base leading-relaxed font-light">
+                          {para}
+                        </p>
+                      ))}
+                    </div>
+                  </div>
+                ) : selectedLetter.title.includes('Ahmed El Shamy') ? (
+                  // Ahmed El Shamy: side-by-side or dual-column stacked layout (English & Arabic)
+                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 divide-y lg:divide-y-0 lg:divide-x divide-white/5">
+                    {/* English Column */}
+                    <div className="space-y-4 text-justify pr-2">
+                      <div className="text-xs text-blue-400 font-bold uppercase tracking-wider border-b border-blue-500/10 pb-1 mb-3">
+                        🇬🇧 English Version
+                      </div>
+                      {getParagraphs(selectedLetter.description.split('=== ARABIC VERSION ===')[0].replace('=== ENGLISH VERSION ===', '')).map((para, idx) => (
+                        <p key={idx} className="text-gray-300 text-sm md:text-base leading-relaxed font-light">
+                          {para}
+                        </p>
+                      ))}
+                    </div>
+
+                    {/* Arabic Column */}
+                    <div className="space-y-4 text-right lg:pl-8 pt-6 lg:pt-0" dir="rtl">
+                      <div className="text-xs text-gold font-bold uppercase tracking-wider border-b border-gold/10 pb-1 mb-3 text-right">
+                        🇪🇬 Arabic Version (النسخة العربية)
+                      </div>
+                      {getParagraphs(selectedLetter.description.split('=== ARABIC VERSION ===')[1] || '').map((para, idx) => (
                         <p key={idx} className="text-gray-300 text-sm md:text-base leading-relaxed font-light">
                           {para}
                         </p>
