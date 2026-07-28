@@ -40,7 +40,11 @@ const AIChatbot: React.FC = () => {
 
     // Recommendation Letters
     api.get('/recommendationletters')
-      .then(res => setDbLetters(res.data || []))
+      .then(res => {
+        const letters = res.data || [];
+        // Temporarily filter out Ahmed El Shamy
+        setDbLetters(letters.filter((l: any) => l.title !== 'Ahmed El Shamy'));
+      })
       .catch(err => console.log('Chatbot failed to fetch letters', err));
   }, []);
 

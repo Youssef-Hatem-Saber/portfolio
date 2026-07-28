@@ -42,7 +42,9 @@ const Recommendations: React.FC = () => {
     api.get('/recommendationletters')
       .then(res => {
         if (res.data && res.data.length > 0) {
-          setLetters(res.data);
+          // Temporarily filter out Ahmed El Shamy
+          const filtered = res.data.filter((letter: Letter) => letter.title !== 'Ahmed El Shamy');
+          setLetters(filtered);
         }
       })
       .catch(err => {
