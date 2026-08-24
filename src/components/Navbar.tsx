@@ -1,10 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useNavigate, useLocation } from 'react-router-dom';
 
 const navItems = [
   { label: 'About', targetId: 'about-section' },
   { label: 'Academic', targetId: 'gpa-section' },
-  { label: 'Courses', targetId: 'courses-section' },
+  { label: 'Certificates', targetId: 'courses-section' },
+  { label: 'Study & Booklets', path: '/courses' },
   { label: 'Experience', targetId: 'experience-section' },
   { label: 'Projects', targetId: 'projects-section' },
   { label: 'Letters', targetId: 'recommendations-section' },
@@ -17,6 +19,8 @@ const Navbar: React.FC = () => {
   const [activeSection, setActiveSection] = useState('about-section');
   const [isScrolled, setIsScrolled] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
+  const navigate = useNavigate();
+  const location = useLocation();
 
   useEffect(() => {
     const handleScroll = () => {
@@ -24,15 +28,21 @@ const Navbar: React.FC = () => {
       setIsScrolled(window.scrollY > 20);
 
       // Active section highlight logic
+      if (location.pathname !== '/') {
+        setActiveSection('');
+        return;
+      }
       const scrollPosition = window.scrollY + 200;
       for (const item of navItems) {
-        const el = document.getElementById(item.targetId);
-        if (el) {
-          const top = el.offsetTop;
-          const height = el.offsetHeight;
-          if (scrollPosition >= top && scrollPosition < top + height) {
-            setActiveSection(item.targetId);
-            break;
+        if (item.targetId) {
+          const el = document.getElementById(item.targetId);
+          if (el) {
+            const top = el.offsetTop;
+            const height = el.offsetHeight;
+            if (scrollPosition >= top && scrollPosition < top + height) {
+              setActiveSection(item.targetId);
+              break;
+            }
           }
         }
       }
@@ -40,14 +50,39 @@ const Navbar: React.FC = () => {
 
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
-  }, []);
+  }, [location.pathname]);
 
-  const handleNavClick = (targetId: string) => {
+  const handleNavClick = (item: typeof navItems[0]) => {
     setIsOpen(false);
-    const el = document.getElementById(targetId);
-    if (el) {
-      el.scrollIntoView({ behavior: 'smooth' });
+    if (item.path) {
+      navigate(item.path);
+      return;
     }
+    if (location.pathname !== '/') {
+      navigate(`/#${item.targetId}`);
+      return;
+    }
+    if (item.targetId) {
+      const el = document.getElementById(item.targetId);
+      if (el) {
+        el.scrollIntoView({ behavior: 'smooth' });
+      }
+    }
+  };
+
+  const handleLogoClick = () => {
+    if (location.pathname !== '/') {
+      navigate('/');
+    } else {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+  };
+
+  const isItemActive = (item: typeof navItems[0]) => {
+    if (item.path) {
+      return location.pathname === item.path;
+    }
+    return location.pathname === '/' && activeSection === item.targetId;
   };
 
   return (
@@ -60,7 +95,7 @@ const Navbar: React.FC = () => {
     >
       <div className="max-w-7xl mx-auto px-6 flex justify-between md:justify-start md:gap-12 items-center">
         {/* Logo and Branding */}
-        <div className="flex items-center gap-3.5 cursor-pointer" onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}>
+        <div className="flex items-center gap-3.5 cursor-pointer" onClick={handleLogoClick}>
           <img 
             src="/assets/Y.H logo.png" 
             alt="Y.H Logo" 
@@ -82,14 +117,14 @@ const Navbar: React.FC = () => {
         <nav className="hidden md:flex items-center gap-1.5 ml-auto md:ml-4">
           {navItems.map((item) => (
             <button
-              key={item.targetId}
-              onClick={() => handleNavClick(item.targetId)}
-              className={`px-4 py-2 text-sm font-medium transition-colors hover:text-white relative rounded-full ${
-                activeSection === item.targetId ? 'text-gold' : 'text-gray-300'
+              key={item.path || item.targetId}
+              onClick={() => handleNavClick(item)}
+              className={`px-4 py-2 text-sm font-medium transition-colors hover:text-white relative rounded-full cursor-pointer ${
+                isItemActive(item) ? 'text-gold font-semibold' : 'text-gray-300'
               }`}
             >
               {item.label}
-              {activeSection === item.targetId && (
+              {isItemActive(item) && (
                 <motion.span
                   layoutId="activeNavBackground"
                   className="absolute inset-0 bg-white/5 rounded-full -z-10"
@@ -99,8 +134,8 @@ const Navbar: React.FC = () => {
             </button>
           ))}
           <button 
-            onClick={() => handleNavClick('contact-section')} // scroll to end or contact
-            className="ml-4 bg-gradient-to-r from-blue-600 to-blue-500 hover:from-blue-500 hover:to-blue-400 text-white px-5 py-2 rounded-full text-sm font-semibold transition-all shadow-[0_0_15px_rgba(59,130,246,0.3)] hover:scale-105"
+            onClick={() => handleNavClick({ label: 'Contact', targetId: 'contact-section' })}
+            className="ml-4 bg-gradient-to-r from-blue-600 to-blue-500 hover:from-blue-500 hover:to-blue-400 text-white px-5 py-2 rounded-full text-sm font-semibold transition-all shadow-[0_0_15px_rgba(59,130,246,0.3)] hover:scale-105 cursor-pointer"
           >
             Get In Touch
           </button>
@@ -134,18 +169,18 @@ const Navbar: React.FC = () => {
             <div className="px-6 py-4 flex flex-col gap-3">
               {navItems.map((item) => (
                 <button
-                  key={item.targetId}
-                  onClick={() => handleNavClick(item.targetId)}
-                  className={`py-2 text-left text-base font-medium transition-colors border-b border-white/5 pb-2 ${
-                    activeSection === item.targetId ? 'text-gold pl-2 border-l-2 border-l-gold' : 'text-gray-300'
+                  key={item.path || item.targetId}
+                  onClick={() => handleNavClick(item)}
+                  className={`py-2 text-left text-base font-medium transition-colors border-b border-white/5 pb-2 cursor-pointer ${
+                    isItemActive(item) ? 'text-gold pl-2 border-l-2 border-l-gold font-semibold' : 'text-gray-300'
                   }`}
                 >
                   {item.label}
                 </button>
               ))}
               <button
-                onClick={() => handleNavClick('contact-section')}
-                className="mt-2 w-full bg-gradient-to-r from-blue-600 to-blue-500 text-white py-3 rounded-xl font-bold transition-all text-center"
+                onClick={() => handleNavClick({ label: 'Contact', targetId: 'contact-section' })}
+                className="mt-2 w-full bg-gradient-to-r from-blue-600 to-blue-500 text-white py-3 rounded-xl font-bold transition-all text-center cursor-pointer"
               >
                 Get In Touch
               </button>
