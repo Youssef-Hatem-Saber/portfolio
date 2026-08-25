@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
+import api from '../utils/api';
 
 interface Booklet {
   id: string;
@@ -16,6 +17,7 @@ const CoursesPage: React.FC = () => {
   const [selectedWebLevel, setSelectedWebLevel] = useState<string>('Web01');
   const [copiedId, setCopiedId] = useState<string | null>(null);
   const [highlightedBookletId, setHighlightedBookletId] = useState<string | null>(null);
+  const [downloadCounts, setDownloadCounts] = useState<Record<string, number>>({});
 
   const booklets: Booklet[] = [
     {
@@ -46,6 +48,38 @@ const CoursesPage: React.FC = () => {
       return () => clearTimeout(timer);
     }
   }, []);
+
+  useEffect(() => {
+    booklets.forEach(booklet => {
+      api.get(`/settings/value/booklet_${booklet.id}_download_count?default=235`)
+        .then(res => {
+          if (res.data && res.data.value !== undefined) {
+            setDownloadCounts(prev => ({
+              ...prev,
+              [booklet.id]: Number(res.data.value)
+            }));
+          }
+        })
+        .catch(err => {
+          console.error(`Failed to fetch download count for booklet ${booklet.id}`, err);
+        });
+    });
+  }, []);
+
+  const handleDownloadBooklet = (id: string) => {
+    api.post(`/settings/increment/booklet_${id}_download_count?default=235`)
+      .then(res => {
+        if (res.data && res.data.value !== undefined) {
+          setDownloadCounts(prev => ({
+            ...prev,
+            [id]: Number(res.data.value)
+          }));
+        }
+      })
+      .catch(err => {
+        console.error(`Failed to increment download count for booklet ${id}`, err);
+      });
+  };
 
   const handleCopyLink = (id: string) => {
     const link = `${window.location.origin}/courses?booklet=${id}`;
@@ -180,12 +214,18 @@ const CoursesPage: React.FC = () => {
                     <a
                       href={booklet.downloadUrl}
                       download
+                      onClick={() => handleDownloadBooklet(booklet.id)}
                       className="flex-1 bg-blue-600 hover:bg-blue-500 text-white font-bold py-3.5 px-4 rounded-xl text-center transition-all duration-300 shadow-lg shadow-blue-600/25 flex items-center justify-center gap-2 text-sm cursor-pointer"
                     >
                       <svg className="w-4.5 h-4.5 fill-current" viewBox="0 0 20 20">
                         <path fillRule="evenodd" d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm3.293-7.707a1 1 0 011.414 0L9 10.586V3a1 1 0 112 0v7.586l1.293-1.293a1 1 0 111.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z" clipRule="evenodd" />
                       </svg>
-                      تحميل مباشر
+                      <span>تحميل مباشر</span>
+                      {downloadCounts[booklet.id] !== undefined && (
+                        <span className="bg-white/20 text-white text-xs px-2 py-0.5 rounded-full border border-white/30">
+                          {downloadCounts[booklet.id]}
+                        </span>
+                      )}
                     </a>
                     
                     <button

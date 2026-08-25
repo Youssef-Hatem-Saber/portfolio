@@ -24,6 +24,7 @@ const Hero: React.FC = () => {
     profilePicture: '/assets/Youssef pic.jpeg',
     resumeUrl: '#'
   });
+  const [downloadCount, setDownloadCount] = useState<number | null>(null);
 
   useEffect(() => {
     api.get('/heroes')
@@ -44,6 +45,16 @@ const Hero: React.FC = () => {
       .catch(err => {
         console.log('Failed to fetch hero, using default branding data.', err);
       });
+
+    api.get('/settings/value/cv_download_count?default=125')
+      .then(res => {
+        if (res.data && res.data.value !== undefined) {
+          setDownloadCount(Number(res.data.value));
+        }
+      })
+      .catch(err => {
+        console.error('Failed to fetch CV download count', err);
+      });
   }, []);
 
   const scrollToGPA = () => {
@@ -53,6 +64,15 @@ const Hero: React.FC = () => {
   const handleDownloadCV = () => {
     if (data.resumeUrl && data.resumeUrl !== '#') {
       window.open(data.resumeUrl, '_blank');
+      api.post('/settings/increment/cv_download_count?default=125')
+        .then(res => {
+          if (res.data && res.data.value !== undefined) {
+            setDownloadCount(Number(res.data.value));
+          }
+        })
+        .catch(err => {
+          console.error('Failed to increment CV download count', err);
+        });
     } else {
       alert('Resume not uploaded yet. You can contact Youssef directly!');
     }
@@ -116,9 +136,14 @@ const Hero: React.FC = () => {
             </button>
             <button 
               onClick={handleDownloadCV}
-              className="glass-panel hover:bg-white/10 hover:scale-105 active:scale-95 text-white px-8 py-3.5 rounded-full font-bold transition-all"
+              className="glass-panel hover:bg-white/10 hover:scale-105 active:scale-95 text-white px-8 py-3.5 rounded-full font-bold transition-all flex items-center gap-2"
             >
-              Download CV
+              <span>Download CV</span>
+              {downloadCount !== null && (
+                <span className="bg-blue-500/20 text-blue-300 text-xs px-2 py-0.5 rounded-full border border-blue-500/30">
+                  {downloadCount}
+                </span>
+              )}
             </button>
             <button 
               onClick={() => document.getElementById('contact-section')?.scrollIntoView({ behavior: 'smooth' })}
