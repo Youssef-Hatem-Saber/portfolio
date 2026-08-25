@@ -24,7 +24,7 @@ const Hero: React.FC = () => {
     profilePicture: '/assets/Youssef pic.jpeg',
     resumeUrl: '#'
   });
-  const [downloadCount, setDownloadCount] = useState<number | null>(null);
+  const [downloadCount, setDownloadCount] = useState<number | null>(125);
 
   useEffect(() => {
     api.get('/heroes')
