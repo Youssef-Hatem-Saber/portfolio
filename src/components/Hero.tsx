@@ -64,6 +64,9 @@ const Hero: React.FC = () => {
   const handleDownloadCV = () => {
     if (data.resumeUrl && data.resumeUrl !== '#') {
       window.open(data.resumeUrl, '_blank');
+      // Optimistically increment locally
+      setDownloadCount(prev => (prev ?? 125) + 1);
+
       api.post('/settings/increment/cv_download_count?default=125')
         .then(res => {
           if (res.data && res.data.value !== undefined) {

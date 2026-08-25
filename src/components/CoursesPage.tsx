@@ -69,6 +69,12 @@ const CoursesPage: React.FC = () => {
   }, []);
 
   const handleDownloadBooklet = (id: string) => {
+    // Optimistically increment locally
+    setDownloadCounts(prev => ({
+      ...prev,
+      [id]: (prev[id] ?? 235) + 1
+    }));
+
     api.post(`/settings/increment/booklet_${id}_download_count?default=235`)
       .then(res => {
         if (res.data && res.data.value !== undefined) {
