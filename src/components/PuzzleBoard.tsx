@@ -136,21 +136,7 @@ export const PuzzleBoard: React.FC<PuzzleBoardProps> = ({ imageUrl, onSolved }) 
     }
   };
 
-  // Helper to trigger autocomplete for testing
-  const autocomplete = () => {
-    setPieces((prev) => {
-      const updated = prev.map((p) => ({
-        ...p,
-        x: p.correctCol * cellW,
-        y: p.correctRow * cellH,
-        isSnapped: true,
-      }));
-      setTimeout(() => {
-        onSolved();
-      }, 300);
-      return updated;
-    });
-  };
+
 
   if (boardWidth === 0) {
     return (
@@ -237,15 +223,7 @@ export const PuzzleBoard: React.FC<PuzzleBoardProps> = ({ imageUrl, onSolved }) 
         })}
       </div>
 
-      {/* Bypass button for dev/testing */}
-      {import.meta.env.DEV && (
-        <button
-          onClick={autocomplete}
-          className="mt-4 text-xs text-gray-600 hover:text-gray-400 underline cursor-pointer"
-        >
-          تخطي البازل (للتجربة أثناء التطوير)
-        </button>
-      )}
+
     </div>
   );
 };
