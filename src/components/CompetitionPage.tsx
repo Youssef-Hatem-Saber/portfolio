@@ -750,7 +750,7 @@ export const CompetitionPage: React.FC = () => {
             <h3 className="text-2xl font-bold text-white mb-2">
               فك الشفرة 5
             </h3>
-            <p className="text-amber-400 text-xs font-semibold mb-6">(ملحوظة: الحرفين الثاني والثالث ما تحتاجهم)</p>
+            <p className="text-amber-400 text-xs font-semibold mb-6">(ملحوظة: الحرفين الثاني والثالث ممكن تحتاجهم)</p>
 
             <div className="bg-[#0A182E]/40 border border-white/5 rounded-2xl p-6 text-center space-y-6 relative overflow-hidden">
               <div>
