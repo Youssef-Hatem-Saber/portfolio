@@ -13,6 +13,7 @@ import Courses from './components/Courses';
 import Competitions from './components/Competitions';
 import AIChatbot from './components/AIChatbot';
 import CoursesPage from './components/CoursesPage';
+import CompetitionPage from './components/CompetitionPage';
 import './index.css';
 
 const Home = () => (
@@ -68,6 +69,7 @@ function App() {
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/courses" element={<CoursesPage />} />
+          <Route path="/kalemt-el-ser" element={<CompetitionPage />} />
         </Routes>
       </main>
       
